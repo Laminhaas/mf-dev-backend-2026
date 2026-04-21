@@ -1,14 +1,13 @@
 ﻿@model IEnumerable<mf_dev_backend_2026.Models.Consumo>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Relatorio";
 }
 
-<h1>Consumo dos veículos</h1>
+<h1>Relatorio do veículo: @ViewBag.Veiculo.Nome</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-success">Adicionar novo consumo</a>
-</p>
+<h3>Valor total: @ViewBag.Total</h3>
+
 <table class="table">
     <thead>
         <tr>
@@ -55,9 +54,9 @@
                 @Html.DisplayFor(modelItem => item.Veiculo.Nome)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning">Editar</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary">Detalhes</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Deletar</a>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }

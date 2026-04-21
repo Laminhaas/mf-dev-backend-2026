@@ -22,6 +22,7 @@ namespace mf_dev_backend_2026.Models
         [Required(ErrorMessage = "Obrigatório informar a quilometragem!")]
         public int Km { get; set; }
 
+        [Required(ErrorMessage = "Obrigatório informar o tipo do combustível!")]
         [Display(Name = "Tipo de combustível")]
         public TipoCombustivel Tipo { get; set; }
 
