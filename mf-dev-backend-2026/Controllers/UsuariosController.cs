@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGeneration.EntityFrameworkCore;
 
 namespace mf_dev_backend_2026.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UsuariosController : Controller
     {
         private readonly AppDbContext _context;
@@ -27,15 +29,33 @@ namespace mf_dev_backend_2026.Controllers
         {
             return View(await _context.Usuarios.ToListAsync());
         }
-        [HttpPost]
-        public async Task<IActionResult> Login(Usuario usuario)
+
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
         {
-            var dados = await _context.Usuarios.FindAsync(usuario.Id);
+            return View();
+        }
+        
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login (Usuario usuario)
+        {
+            var dados = await _context.Usuarios
+                .FindAsync(usuario.Id);
+
 
             if (dados == null)
             {
-                ViewBag.Message = "Usuário e/ou senha invalidos!";
-                return View(usuario);
+                ViewBag.Message = "Usuario e/ou senha invalidos!";
+                return View();
             }
 
             bool senhaOk = BCrypt.Net.BCrypt.Verify(usuario.Senha, dados.Senha);
@@ -49,32 +69,30 @@ namespace mf_dev_backend_2026.Controllers
                     new Claim(ClaimTypes.Role, dados.Perfil.ToString())
                 };
 
-                var usuarioIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var usuarioIdentity = new ClaimsIdentity(claims, "Login");
                 ClaimsPrincipal principal = new ClaimsPrincipal(usuarioIdentity);
 
                 var props = new AuthenticationProperties
                 {
                     AllowRefresh = true,
-                    ExpiresUtc = DateTime.UtcNow.AddHours(8),
+                    ExpiresUtc = DateTime.UtcNow.ToLocalTime().AddHours(8),
                     IsPersistent = true,
                 };
 
                 await HttpContext.SignInAsync(principal, props);
 
-                return RedirectToAction("Index", "Home");
+                return Redirect("/");
+
             }
-
-            ViewBag.Message = "Usuário e/ou senha invalidos!";
-            return View(usuario);
-
-            
-        }
-
-        [HttpGet]
-        public IActionResult Login()
-        {
+            else
+            {
+                ViewBag.Message = "Usuario e/ou senha inválidos!";
+            }
             return View();
+
         }
+
+
 
         [AllowAnonymous]
         [HttpGet]
